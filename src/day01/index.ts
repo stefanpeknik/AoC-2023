@@ -20,29 +20,30 @@ const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
   const cords = input.split("\n").reduce((acc, curr) => {
-    const map = new Map<string, string>();
-    map.set("one", "1");
-    map.set("two", "2");
-    map.set("three", "3");
-    map.set("four", "4");
-    map.set("five", "5");
-    map.set("six", "6");
-    map.set("seven", "7");
-    map.set("eight", "8");
-    map.set("nine", "9");
-    map.set("1", "1");
-    map.set("2", "2");
-    map.set("3", "3");
-    map.set("4", "4");
-    map.set("5", "5");
-    map.set("6", "6");
-    map.set("7", "7");
-    map.set("8", "8");
-    map.set("9", "9");
+    const dict: { [key: string]: string } = {
+      "one": "1",
+      "two": "2",
+      "three": "3",
+      "four": "4",
+      "five": "5",
+      "six": "6",
+      "seven": "7",
+      "eight": "8",
+      "nine": "9",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9"
+    };
     const firstPattern = /(one|two|three|four|five|six|seven|eight|nine|[0-9])/g;
     const lastPattern = /(eno|owt|eerht|ruof|evif|xis|neves|thgie|enin|[0-9])/g;
-    const first = map.get(curr.match(firstPattern)![0])!;
-    const last = map.get([...curr].reverse().join("").match(lastPattern)![0]!.split("").reverse().join(""))!;
+    const first = dict[curr.match(firstPattern)![0]];
+    const last = dict[[...curr].reverse().join("").match(lastPattern)![0].split("").reverse().join("")];
     const cords = first + last;
     return acc + parseInt(cords);
   }, 0);
