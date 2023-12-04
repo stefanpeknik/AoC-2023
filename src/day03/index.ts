@@ -17,8 +17,8 @@ function isCharNumber(char: string): boolean {
  * @returns  true if any symbol is adjecent to the number
  */
 function AnyAdjecentSymbolTo(indexes: { i: number, j: number }[], array: string[][]): boolean {
-  for (let i = indexes[0].i - 1; i <= indexes[indexes.length - 1].i + 1; i++) { // start one to left from number and end one to right from indexes
-    for (let j = indexes[0].j - 1; j <= indexes[indexes.length - 1].j + 1; j++) { // start one to top from number and end one to bottom from indexes
+  for (let i = indexes[0].i - 1; i <= indexes[indexes.length - 1].i + 1; i++) { // start one to top from number and end one to bottom from indexes
+    for (let j = indexes[0].j - 1; j <= indexes[indexes.length - 1].j + 1; j++) { // start one to left from number and end one to right from indexes
       if (indexes.some((index) => index.i === i && index.j === j)) { // skip over given indexes
         continue;
       }
