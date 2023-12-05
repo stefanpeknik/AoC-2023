@@ -51,6 +51,20 @@ function parseMap(mapName: string, lines: string[]) {
     map.push({ dst_start, src_start, len });
   }
   return map;
+};
+
+function findSeedFinalLocation(seed: number, maps: Map[][]) {
+  let place = seed;
+  for (let map of maps) { // For each map
+    for (let m of map) { // For each map entry
+      if (place >= m.src_start && place < m.src_start + m.len) { // If the seed is in the map
+        place = m.dst_start + (place - m.src_start); // Move the seed to the new location
+        break;
+      }
+    }
+    // If the seed is not in the map, it is "mapped" to itself 
+  }
+  return place;
 }
 
 const part1 = (rawInput: string) => {
@@ -59,17 +73,7 @@ const part1 = (rawInput: string) => {
   const finalLocations: number[] = [];
 
   for (let seed of input.seeds) { // For each seed
-    let place = seed;
-    for (let maps of input.maps) { // For each map
-      for (let m of maps) { // For each map entry
-        if (place >= m.src_start && place < m.src_start + m.len) { // If the seed is in the map
-          place = m.dst_start + (place - m.src_start); // Move the seed to the new location
-          break;
-        }
-      }
-      // If the seed is not in the map, it is "mapped" to itself 
-    }
-    finalLocations.push(place);
+    finalLocations.push(findSeedFinalLocation(seed, input.maps)); // Find the final location of the seed
   }
 
   return Math.min(...finalLocations);
@@ -78,7 +82,18 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  return;
+  let min;
+
+  for (let i = 0; i < input.seeds.length; i += 2) {
+    for (let j = 0; j < input.seeds[i + 1]; j++) {
+      const final = findSeedFinalLocation(input.seeds[i] + j, input.maps);
+      if (!min || final < min) {
+        min = final;
+      }
+    }
+  }
+
+  return min;
 };
 
 run({
@@ -126,13 +141,46 @@ humidity-to-location map:
   },
   part2: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: `
+seeds: 79 14 55 13
+
+seed-to-soil map:
+50 98 2
+52 50 48
+
+soil-to-fertilizer map:
+0 15 37
+37 52 2
+39 0 15
+
+fertilizer-to-water map:
+49 53 8
+0 11 42
+42 0 7
+57 7 4
+
+water-to-light map:
+88 18 7
+18 25 70
+
+light-to-temperature map:
+45 77 23
+81 45 19
+68 64 13
+
+temperature-to-humidity map:
+0 69 1
+1 0 69
+
+humidity-to-location map:
+60 56 37
+56 93 4`,
+        expected: 46,
+      },
     ],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
