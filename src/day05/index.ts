@@ -2,13 +2,7 @@ import run from "aocrunner";
 
 type Input = {
   seeds: number[];
-  seedToSoil: Map[];
-  soilToFertilizer: Map[];
-  fertilizerToWater: Map[];
-  waterToLight: Map[];
-  lightToTemperature: Map[];
-  temperatureToHumidity: Map[];
-  humidityToLocation: Map[];
+  maps: Map[][];
 };
 
 type Map = {
@@ -19,44 +13,31 @@ type Map = {
 
 const parseInput = (rawInput: string) => {
   let seeds: number[] = [];
-  let seedToSoil: Map[] = [];
-  let soilToFertilizer: Map[] = [];
-  let fertilizerToWater: Map[] = [];
-  let waterToLight: Map[] = [];
-  let lightToTemperature: Map[] = [];
-  let temperatureToHumidity: Map[] = [];
-  let humidityToLocation: Map[] = [];
+  let maps: Map[][] = [];
 
   let lines = rawInput.split("\n");
 
   // Parse seeds (skip "seeds: ")
   seeds = lines[0].substring(7).split(" ").map((s) => parseInt(s));
   // Parse seed-to-soil map
-  seedToSoil = parseMap("seed-to-soil map", lines);
+  maps.push(parseMap("seed-to-soil map", lines));
   // Parse soil-to-fertilizer map
-  soilToFertilizer = parseMap("soil-to-fertilizer map", lines);
+  maps.push(parseMap("soil-to-fertilizer map", lines));
   // Parse fertilizer-to-water map
-  fertilizerToWater = parseMap("fertilizer-to-water map", lines);
+  maps.push(parseMap("fertilizer-to-water map", lines));
   // Parse water-to-light map
-  waterToLight = parseMap("water-to-light map", lines);
+  maps.push(parseMap("water-to-light map", lines));
   // Parse light-to-temperature map
-  lightToTemperature = parseMap("light-to-temperature map", lines);
+  maps.push(parseMap("light-to-temperature map", lines));
   // Parse temperature-to-humidity map
-  temperatureToHumidity = parseMap("temperature-to-humidity map", lines);
+  maps.push(parseMap("temperature-to-humidity map", lines));
   // Parse humidity-to-location map
-  humidityToLocation = parseMap("humidity-to-location map", lines);
+  maps.push(parseMap("humidity-to-location map", lines));
 
   const input: Input = {
     seeds,
-    seedToSoil,
-    soilToFertilizer,
-    fertilizerToWater,
-    waterToLight,
-    lightToTemperature,
-    temperatureToHumidity,
-    humidityToLocation,
+    maps,
   };
-  console.log(input);
 
   return input;
 };
@@ -64,7 +45,8 @@ const parseInput = (rawInput: string) => {
 function parseMap(mapName: string, lines: string[]) {
   let index = lines.findIndex((line) => line.includes(mapName));
   let map: Map[] = [];
-  while (lines[++index] && lines[++index] != "") {
+  while (lines[index + 1] && lines[index + 1] != "") {
+    index++;
     const [dst_start, src_start, len] = lines[index].split(" ").map((s) => parseInt(s));
     map.push({ dst_start, src_start, len });
   }
@@ -74,9 +56,23 @@ function parseMap(mapName: string, lines: string[]) {
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  
+  const finalLocations: number[] = [];
 
-  return;
+  for (let seed of input.seeds) { // For each seed
+    let place = seed;
+    for (let maps of input.maps) { // For each map
+      for (let m of maps) { // For each map entry
+        if (place >= m.src_start && place < m.src_start + m.len) { // If the seed is in the map
+          place = m.dst_start + (place - m.src_start); // Move the seed to the new location
+          break;
+        }
+      }
+      // If the seed is not in the map, it is "mapped" to itself 
+    }
+    finalLocations.push(place);
+  }
+
+  return Math.min(...finalLocations);
 };
 
 const part2 = (rawInput: string) => {
@@ -123,7 +119,7 @@ temperature-to-humidity map:
 humidity-to-location map:
 60 56 37
 56 93 4`,
-        expected: "",
+        expected: 35,
       },
     ],
     solution: part1,
